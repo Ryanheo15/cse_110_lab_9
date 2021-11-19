@@ -69,25 +69,39 @@
     </form>
 
     <section id="error-btns">
-      <button>Console Log</button>
-      <button>Console Error</button>
-      <button>Console Count</button>
-      <button>Console Warn</button>
-      <button>Console Assert</button>
-      <button>Console Clear</button>
-      <button>Console Dir</button>
-      <button>Console dirxml</button>
-      <button>Console Group Start</button>
-      <button>Console Group End</button>
-      <button>Console Table</button>
-      <button>Start Timer</button>
-      <button>End Timer</button>
-      <button>Console Trace</button>
-      <button>Trigger a Global Error</button>
+      <button id="logBtn">Console Log</button>
+      <button id="errorBtn">Console Error</button>
+      <button id="countBtn">Console Count</button>
+      <button id="warnBtn">Console Warn</button>
+      <button id="assertBtn">Console Assert</button>
+      <button id="clearBtn">Console Clear</button>
+      <button id="dirBtn">Console Dir</button>
+      <button id="dirXmlBtn">Console dirxml</button>
+      <button id="groupStartBtn">Console Group Start</button>
+      <button id="groupEndBtn">Console Group End</button>
+      <button id=tableBtn>Console Table</button>
+      <button id="startTimerBtn">Start Timer</button>
+      <button id="endTimerBtn">End Timer</button>
+      <button id="traceBtn">Console Trace</button>
+      <button id="globalErrorBtn">Trigger a Global Error</button>
     </section>
   </main>
 
   <script>
+    //Custom error
+    class NumValueError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "NumGreatError";
+      }
+    }
+
+    function checkValues(num1, num2) {
+      if (num1 > 100 || num2 > 100) {
+        throw new NumValueError("Num should be less than 100");
+      }
+    }
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,14 +109,124 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+
+      try {
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+        let firstNumConvert = parseInt(firstNum);
+        let secondNumConvert = parseInt(secondNum);
+
+        checkValues(firstNumConvert, secondNumConvert);
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          alert("Fix your syntax!");
+          console.log("Syntax error: " + err.stack);
+          throw new SyntaxError("Syntax error");
+        }
+        else if (err instanceof NumValueError) {
+          alert("num should be less than 100");
+          console.log("Num error: " + err.stack);
+        } else {
+          throw err;
+        }
+      } finally {
+        console.log("you have made it through the program");
+      }
+
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+    document.querySelector("#logBtn").addEventListener("click", () => {
+      console.log("logging");
+    });
+
+    document.querySelector("#errorBtn").addEventListener("click", () => {
+      console.error("error");
+    });
+
+    document.querySelector("#countBtn").addEventListener("click", () => {
+      console.count();
+    });
+
+    document.querySelector("#warnBtn").addEventListener("click", () => {
+      console.warn("warning");
+    });
+
+    document.querySelector("#assertBtn").addEventListener("click", () => {
+      let reason = 'x is expected to be less than y';
+      let x = 1;
+      let y = 0;
+      console.assert(x < y, { x, y, reason });
+    });
+
+    document.querySelector("#clearBtn").addEventListener("click", () => {
+      console.clear();
+    });
+
+    document.querySelector("#dirBtn").addEventListener("click", function () {
+      console.dir(this);
+    });
+
+    document.querySelector("#dirXmlBtn").addEventListener("click", function () {
+      console.dirxml(this);
+    });
+
+    document.querySelector("#groupStartBtn").addEventListener("click", () => {
+      console.group("group");
+    });
+
+    document.querySelector("#groupEndBtn").addEventListener("click", () => {
+      console.groupEnd("group");
+    });
+
+    document.querySelector("#tableBtn").addEventListener("click", () => {
+      console.table([1, 2, 3, 4, 5, 6]);
+    });
+
+    document.querySelector("#startTimerBtn").addEventListener("click", () => {
+      console.time();
+    });
+
+    document.querySelector("#endTimerBtn").addEventListener("click", () => {
+      console.timeEnd();
+    });
+
+    document.querySelector("#traceBtn").addEventListener("click", () => {
+      const first = () => { second(); };
+      const second = () => { third(); };
+      const third = () => { fourth(); };
+      const fourth = () => { console.trace(); };
+      first();
+    });
+
+    document.querySelector("#globalErrorBtn").addEventListener("click", () => {
+      let x = null
+      console.log(null.property);
+    });
+
+    window.addEventListener('error', (err) => {
+      console.log(err);
+    });
+
+    //Global error 
+    window.addEventListener('error', function (event) { console.log(event); })
+
+
   </script>
+
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({
+      token: "7e5514063ea24f23a9e4c58d03f42f11"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+
+    TrackJS.track('Testing TrackJS!');
+                       
+  </script>
+
 </body>
 
 </html>
